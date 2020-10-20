@@ -2,77 +2,45 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>音声認識サンプル</title>
+    <title>音声認識</title>
 </head>
 <body>
-    <h2>音声認識サンプル</h2>
-    <button id="btn">start</button>
-    <div id="content"></div>
+<div>
+    <h2 style="text-align: center;">音声認識</h2>
+    <div style="margin: 0px 47%;">
+        <button id="start_btn" style="text-align: center; height: 50px; width: 100px;">start</button>
+    </div>
+</div>
+<div id="content" style="text-align: center;"></div>
 
-<style>
-    body{
-        text-align: left;
-                font-size:40px;
-        -webkit-text-size-adjust:100%;
-             }
-
-        div.status{
-        color:gray;
-        font-size:30px;
-        -webkit-text-size-adjust:100%;
-    }
-
-</style>
-
-
-<body>
-
-<div id="status-div" class=status></div>
-<div id="result-div"></div>
-
-</body>
 <script>
-  let finalTranscript = '';
-function SPEECH(){
-  const resultDiv = document.querySelector('#result-div');
-  const statusDiv = document.querySelector('#status-div');
-  SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
-  let recognition = new SpeechRecognition();
-  recognition.lang = 'ja-JP';
- // recognition.interimResults = true;暫定的な結果はandroidだとうまく出来ませんでした
-  recognition.continuous = true;
-  recognition.start();
-  recognition.onaudiostart = function(){
-    statusDiv.innerHTML = "STATUS>>認識中";
-  };
-  recognition.onaudioend = function() {
-    statusDiv.innerHTML ="STATUS>>再読込完了";
-        SPEECH();
-  };
- recognition.onnomatch = function() {
-　       statusDiv.innerHTML="STATUS>>　　　";
-  };
-  recognition.error = function() {
-         statusDiv.innerHTML="エラー<br>ブラウザで更新してください";
-  };
-  recognition.onresult = (event) => {
-    let interimTranscript = ''; //暫定的な結果はandroidだとうまく出来ませんがなんとなく残してます
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      let transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalTranscript = '>'+transcript+'<br>'+finalTranscript;
-      } else {
-        interimTranscript = transcript;//暫定的な結果はandroidだとうまく出来ませんがなんとなく残してます
-      }
+    const speech = new webkitSpeechRecognition();
+    speech.lang = 'ja-JP';
+
+    const start_btn = document.getElementById('start_btn');
+    const end_btn = document.getElementById('end_btn');
+    const content = document.getElementById('content');
+
+    start_btn.addEventListener('click', function () {
+        // 音声認識をスタート
+        speech.start();
+    });
+
+    //音声自動文字起こし機能
+    speech.onresult = function (e) {
+        speech.stop();
+        if (e.results[0].isFinal) {
+            var autotext = e.results[0][0].transcript
+            content.innerHTML += '<div>' + autotext + '</div>';
+        }
     }
 
-    resultDiv.innerHTML = finalTranscript;
-  }
+    speech.onend = () =>
+    {
+        speech.start()
+    };
 
-}
-  window.onload =function(){
-   SPEECH();
-};
 </script>
+
 <body>
 <html>
